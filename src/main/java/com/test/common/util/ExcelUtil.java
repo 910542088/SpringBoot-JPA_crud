@@ -12,7 +12,7 @@ public class ExcelUtil {
             fileName = URLEncoder.encode(fileName,"utf-8");
             response.setContentType("application/vnd.ms-excel");
             response.setCharacterEncoding("utf-8");
-            //此处指定了文件类型为xls，如果是xlsx的，请自行替换修改
+            //此处指定了文件类型为xlsx，如果是xls的，请自行替换修改
             response.setHeader("Content-Disposition", "attachment; filename=" + fileName + ".xlsx");
             response.setHeader("Pragma", "public");
             response.setHeader("Cache-Control", "no-store");

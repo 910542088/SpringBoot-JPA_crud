@@ -8,6 +8,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -28,9 +29,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public int delete(String id) {
+    public int delete(String[] id) {
         try {
-            mapper.deleteById(id);
+            mapper.deleteBatch(id);
+
         } catch (Exception e) {
             e.printStackTrace();
             return 0;

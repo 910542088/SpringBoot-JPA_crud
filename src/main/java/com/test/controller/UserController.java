@@ -55,11 +55,11 @@ public class UserController {
         return jsonMap;
     }
 
-    //根据ID删除用户
+    //根据ID删除用户,前端发送的ajax注意标明 --> traditional：true
     @PostMapping("/delete")
     @ResponseBody
-    public int delete(String id) {
-        return userService.delete(id);
+    public int delete(@RequestParam("ids") String[] ids) {
+        return userService.delete(ids);
     }
 
     @PostMapping("/saveOrUpdate")
@@ -69,7 +69,7 @@ public class UserController {
     }
 
     @GetMapping("/down")
-    public void downExcelFile(HttpServletResponse response) throws IOException {
+    public void downExcelFile(HttpServletResponse response) throws Exception {
         List<User> userList = userService.getAll();
         try {
             String fileName = "用户数据";

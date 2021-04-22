@@ -11,7 +11,7 @@ public interface UserService {
 
     List<User> getAll();
 
-    int delete(String id);
+    int delete(String[] id);
 
     Page<User> selectPage(Integer currentPage, Integer pageSize, String name, String value);
 }

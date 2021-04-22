@@ -13,13 +13,13 @@ public class MyExceptionHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MyExceptionHandler.class);
 
-    @ExceptionHandler(value = Exception.class)
+    @ExceptionHandler(value = ExcelDataConvertException.class)
     public String dateConverterException(ExcelDataConvertException e){
         int row = 0;
         int column = 0;
         row = e.getRowIndex();
         column = e.getColumnIndex();
-        LOGGER.info("第{}行第{}列数据异常，请查看格式是否符合要求！！！！",row,column);
+        LOGGER.info("第{}行第{}列数据异常，请查看格式是否符合要求！！！！",row+1,column+1);
         return "第" + (row+1) + "行第" + (column+1) + "列数据异常，请查看格式是否正确！";
     }
 
