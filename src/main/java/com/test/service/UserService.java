@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface UserService {
 
-    User saveOrUpdate(User user);
+    User saveOrUpdate(User user) throws IllegalAccessException;
 
     List<User> getAll();
 

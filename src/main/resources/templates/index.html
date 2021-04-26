@@ -2,32 +2,33 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>增删查改</title>
     <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/default/easyui.css">
     <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/icon.css">
     <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/color.css">
     <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/demo/demo.css">
     <script type="text/javascript" src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="js/ConvertPinyin.js"></script>
     <script type="text/javascript" src="https://www.jeasyui.com/easyui/jquery.easyui.min.js"></script>
 </head>
 <body>
 <!--table中的url会发送一个currentPage和pageSize的参数（默认为1,10.可以修改），也可以带参数发送-->
-<table id="dg" title="用户表" class="easyui-datagrid" style="width:1000px;height:500px"
+<table id="dg" title="用户表" class="easyui-datagrid" style="width:100%;height:100%"
        url="/selectPage" toolbar="#toolbar" pagination="true"
-       rownumbers="true" fitColumns="true" singleSelect="false" checkOnSelect="true"
-       pageNumber="1" pageSize="5" pageList=[5,10,15] >
+       rownumbers="true" fitColumns="false" singleSelect="false" checkOnSelect="true"
+       pageNumber="1" pageSize="50" pageList=[50,100,150]>
     <thead>
     <tr>
-<!--        <th field="id" width="30" hidden>ID</th>-->
-        <th field="id" checkbox="true"></th>
-        <th field="name" width="20">姓名</th>
-        <th field="spellName" width="30">姓名简拼</th>
-        <th field="sex" width="12">性别</th>
-        <th field="idType" width="20">证件类型</th>
-        <th field="idNumber" width="50">身份证编号</th>
-        <th field="birthday" width="30">出生日期</th>
-        <th field="phoneNumber" width="30">手机号码</th>
-        <th field="email" width="50">电子邮箱</th>
+        <th field="id" checkbox="true">
+        <th field="name" width="100px">姓名</th>
+        <th field="spellName" width="150px">姓名全拼</th>
+        <th field="sex" width="100px">性别</th>
+        <th field="idType" width="150px">身份证证件类型</th>
+        <th field="idNumber" width="200px">身份证件号码</th>
+        <th field="birthday" width="150px">出生日期</th>
+        <th field="phoneNumber" width="150px">手机号码</th>
+        <th field="email" width="200px">电子邮箱</th>
     </tr>
     </thead>
 </table>
@@ -36,133 +37,174 @@
     <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true"
        onclick="editUser()">编辑用户</a>
     <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="destroyUser()">删除用户</a>
-    <a href="javascript:void(0)" class="easyui-linkbutton" plain="false" onclick="fresh()">刷新列表</a>
     <input id="ss" class="easyui-searchbox" style="width:280px"
            data-options="searcher:qq,prompt:'请输入查询的关键字',menu:'#mm'">
     <div id="mm" style="width:120px">
         <div data-options="name:'Column_2',iconCls:'icon-ok'">姓名</div>
         <div data-options="name:'Column_8'">手机号</div>
         <div data-options="name:'Column_6'">身份证号码</div>
-    </div>&nbsp;&nbsp;&nbsp;
-    <a href="/down" class="easyui-linkbutton" data-options="iconCls:'icon-print'" data-cmd="exportFile">导出excel</a>
-    <form id="file" enctype="multipart/form-data" method="post">
-        <input id="choseFile" class="easyui-filebox" style="width:200px" name="file" data-options="required:true">
-        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-save" plain="false" onclick="update()">上传</a>
+    </div>
+    <a href="/downTemplate" class="easyui-linkbutton" data-options="iconCls:'icon-print'" data-cmd="exportFile" style="margin-left:20px">导出模板</a>
+    <a href="/down" class="easyui-linkbutton" data-options="iconCls:'icon-print'" data-cmd="exportFile" style="margin-left:20px">导出excel数据</a>
+    <form id="update" enctype="multipart/form-data" method="post" style="display: inline;margin-left:20px">
+        <input id="filebox" name="file" class="easyui-filebox" style="width:10px">
     </form>
 </div>
 
 <div id="dlg" class="easyui-dialog" style="width:450px"
      data-options="closed:true,modal:true,border:'thin',buttons:'#dlg-buttons'">
     <form id="fm" method="post" novalidate style="margin:0;padding:20px 50px">
-        <h3>用户信息</h3>
         <div style="margin-bottom:10px" hidden>
-            <input name="id" class="easyui-tesxtbox" data-options="required:false" label="ID:" style="width:100%"
-                   readonly>
+            <input name="id" class="easyui-textbox" data-options="required:false" label="ID:" style="width:100%">
         </div>
         <div style="margin-bottom:10px">
-            <input name="name" class="easyui-textbox" required="true" label="姓名:" style="width:100%">
+            <input id="name" name="name" class="easyui-textbox" label="姓名:"
+                   style="width:100%" data-options="events:{blur:setName},required:true">
         </div>
         <div style="margin-bottom:10px">
-            <input name="spellName" class="easyui-textbox" required="true" label="姓名简拼:" style="width:100%">
+            <input id="spellName" name="spellName" class="easyui-validatebox" required="true" label="姓名全拼:"
+                   style="width:100%">
         </div>
         <div style="margin-bottom:10px">
-            <input name="sex" class="easyui-textbox" required="true" label="性别:" style="width:100%">
+            <select id="idType" editable="false" class="easyui-combobox" name="idType" required="true" label="身份证证件类型:"
+                    style="width:100%" onSelect="changeType()" panelHeight="200"
+                    data-options="valueField: 'value',textField: 'value',url:'/getIdType'"></select>
         </div>
         <div style="margin-bottom:10px">
-            <input name="idType" class="easyui-textbox" required="true" label="证件类型:" style="width:100%">
+            <input id="idNumber" name="idNumber" class="easyui-textbox" required="true" label="身份证件号码:"
+                   style="width:100%" validType="idcard" data-options="events:{blur:setBirthdayAndSex}">
         </div>
         <div style="margin-bottom:10px">
-            <input name="idNumber" class="easyui-textbox" required="true" label="身份证编号:" style="width:100%">
+            <select id="sex" editable="false" class="easyui-combobox" name="sex" required="true" label="性别:"
+                    style="width:100%;" panelHeight="70">
+                <option value="男">男</option>
+                <option value="女">女</option>
+            </select>
         </div>
         <div style="margin-bottom:10px">
-            <input name="birthday" class="easyui-datebox" required="true" label="出生日期:" style="width:100%">
+            <input id="birthday" name="birthday" class="easyui-datebox"
+                   data-options="formatter:myformatter,parser:myparser"
+                   required="true" editable="false" label="出生日期:" style="width:100%"/>
         </div>
         <div style="margin-bottom:10px">
-            <input name="phoneNumber" class="easyui-textbox" required="true" label="手机号码:" style="width:100%">
+            <input name="phoneNumber" class="easyui-textbox" required="true" validType="mobile" label="手机号码:"
+                   style="width:100%">
         </div>
         <div style="margin-bottom:10px">
-            <input name="email" class="easyui-textbox" required="true" validType="email" label="Email:"
+            <input name="email" class="easyui-textbox" required="true" validType="email" label="电子邮箱:"
                    style="width:100%">
         </div>
     </form>
 </div>
 <div id="dlg-buttons">
-    <a href="javascript:void(0)" class="easyui-linkbutton c6" iconCls="icon-ok" onclick="saveUser()" style="width:90px">Save</a>
+    <a href="javascript:void(0)" class="easyui-linkbutton c6" iconCls="icon-ok" onclick="saveUser()" style="width:90px">保存</a>
     <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel"
-       onclick="javascript:$('#dlg').dialog('close')" style="width:90px">Cancel</a>
+       onclick="javascript:$('#dlg').dialog('close')" style="width:90px">取消</a>
 </div>
 <script type="text/javascript">
 
-    //刷新页面
-    function fresh(){
-        location.reload();
-        // $('#ss').searchbox('setValue','');
-        // $('#dg').datagrid({
-        //     queryParams: {
-        //         name: "",
-        //         value: ""
-        //     }
-        // });
+    //自动设置生日和性别
+    $('#idType').combobox({
+        onSelect: function () {
+            let value = $('#idNumber').textbox('textbox').val();
+            if (value) {
+                var birth = value.substring(6, 10) + "/" + value.substring(10, 12) + "/" + value.substring(12, 14);
+                var sex = parseInt(value.substr(16, 1)) % 2 === 1 ? "男" : "女";
+                $('#sex').textbox('setValue', sex);
+                $('#birthday').textbox('setValue', birth);
+            }
+        }
+    });
+    function setBirthdayAndSex() {
+        let value = $('#idNumber').textbox('textbox').val();
+        let idType = $('#idType').textbox("textbox").val();
+        if (idType === "居民身份证") {
+            if (value.length === 0) {
+                //do nothing
+            } else {
+                var birth = value.substring(6, 10) + "/" + value.substring(10, 12) + "/" + value.substring(12, 14);
+                var sex = parseInt(value.substr(16, 1)) % 2 === 1 ? "男" : "女";
+                $('#sex').textbox('setValue', sex);
+                $('#birthday').textbox('setValue', birth);
+            }
+        }
     }
 
-    //更新用户信息
-    function update(){
-        $('#file').form('submit', {
-            url:"/update",
-            onSubmit: function(){
-                let form = $(this).form('validate');
-                if (!form) {
-                    $.messager.alert("消息", "请选择上传文件");
-                    return false;
-                }
-                return true;
-            },
-            success:function(data){
-                $(this).form("clear");
-                $.messager.alert("消息", data);
-                $('#dg').datagrid('reload');
+    //自动生成拼音全拼
+    function setName() {
+        let value = $('#name').textbox('textbox')[0].value;
+        let pinyin = ConvertPinyin(value);
+        $("#spellName").textbox('setValue', pinyin)
+    }
+
+    //datebox控件日期格式转换
+    function myformatter(date) {
+        var y = date.getFullYear();
+        var m = date.getMonth() + 1;
+        var d = date.getDate();
+        return y + '/' + (m < 10 ? ('0' + m) : m) + '/' + (d < 10 ? ('0' + d) : d);
+    }
+    function myparser(s) {
+        if (!s) return new Date();
+        var ss = (s.split('/'));
+        var y = parseInt(ss[0], 10);
+        var m = parseInt(ss[1], 10);
+        var d = parseInt(ss[2], 10);
+        if (!isNaN(y) && !isNaN(m) && !isNaN(d)) {
+            return new Date(y, m - 1, d);
+        } else {
+            return new Date();
+        }
+    }
+
+    $("#filebox").filebox({
+        // icon:save,
+        width: 70,
+        buttonText: "导入数据",
+        // accept: "application/vnd.ms-excel,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        multiple: false,
+        onChange: function (newValue, oldValue) {
+            if (newValue != "") {
+                $("#update").form('submit', {
+                    url: "/upload",
+                    onSubmit: function () {
+                        console.log($("#filebox").filebox('getValue'))
+                    },
+                    success: function (resp) {
+                        $(this).form("clear");
+                        $.messager.alert("消息", resp);
+                        $('#dg').datagrid('reload');
+                    }
+                })
+            }
+        }
+    })
+
+    //搜索框发起带参数的请求
+    function qq(value, name) {
+        $('#dg').datagrid({
+            queryParams: {
+                name: name,
+                value: value.trim()
             }
         });
     }
 
-    //上传文件设置（可以选择 *.xls & *.xlsx 的文件）
-    $("#choseFile").filebox({
-        buttonText:"选择文件",
-        buttonAlign:"right",
-        accept:"application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    })
-
-    //搜索框发起带参数的请求
-    function qq(value,name){
-        if (!value){
-            $.messager.alert("消息", "请输入关键字");
-        } else {
-            // alert(name+"-->"+value);
-            $('#dg').datagrid({
-                queryParams: {
-                    name: name,
-                    value: value.trim()
-                }
-            });
-            // $('#dg').datagrid('reload');
-        }
-    }
-
     //打开创建窗口
     function newUser() {
-        $('#dlg').dialog('open').dialog('center').dialog('setTitle', 'User');
+        $('#dlg').dialog('open').dialog('center').dialog('setTitle', '用户信息');
         $('#fm').form('clear');
     }
 
     //打开编辑窗口渲染行内的数据
     function editUser() {
+
         var row = $('#dg').datagrid('getChecked');
-        var rowDate = $('#dg').datagrid('getSelected');
-        if (row.length>1){
+        if (row.length === 1) {
+            $('#dlg').dialog('open').dialog('center').dialog('setTitle', '用户信息');
+            $('#fm').form('load', row[0]);
+        } else if (row.length > 1) {
             $.messager.alert("消息", "一次只能修改一条数据");
-        } else if (row) {
-            $('#dlg').dialog('open').dialog('center').dialog('setTitle', 'User');
-            $('#fm').form('load', rowDate);
         }
     }
 
@@ -171,18 +213,16 @@
         $('#fm').form('submit', {
             url: "/saveOrUpdate",
             onSubmit: function () {
-                //表单验证（隐藏的id属性require设置为false）
                 let form = $(this).form('validate');
                 if (!form) {
-                    $.messager.alert("消息", "没有填写完整");
+                    // $.messager.alert("消息", "填写数据存在异常");
                     return false;
                 }
                 return true;
             },
             success: function (result) {
-                // var result = eval('(' + result + ')');
-                if (!result) {
-                    $.messager.alert("消息", "提交失败");
+                if (result) {
+                    $.messager.alert("消息", result);
                 } else {
                     $('#ss').searchbox('setValue', '');
                     $('#dg').datagrid({
@@ -200,22 +240,21 @@
     }
 
     function destroyUser() {
-        // var row = $('#dg').datagrid('getSelected');//获取单独的列
+        var row = $('#dg').datagrid('getSelected');//获取单独的列
         var rowDate = $('#dg').datagrid('getChecked');//获取check的列
         var data = [];
         $.each(rowDate, function (i, e) {
             data[i] = e.id;
         })
-        console.log(data);
-        if (data) {
+        if (row) {
             $.messager.confirm('警告', '确定要删除吗？', function (r) {
                 if (r) {
                     $.ajax({
                         type: "post",
                         url: "/delete",
-                        data: {ids:data},
+                        data: {ids: data},
                         traditional: true,
-                        success: function (result){
+                        success: function (result) {
                             if (result == 1) {
                                 $.messager.alert("消息", "操作成功");
                                 $('#dg').datagrid('reload');    // reload the user data
@@ -231,6 +270,67 @@
             });
         }
     }
+
+    // 调整宽度dlg表单UI
+    $('input').textbox({
+        labelWidth: 110,
+        missingMessage: '该输入项为必输项'
+    });
+    $('select').combobox({
+        labelWidth: 110,
+        missingMessage: '该输入项为必输项'
+    })
+    $('#birthday').datebox({
+        labelWidth: 110,
+        missingMessage: '该输入项为必输项'
+    })
+
+    //自定义验证
+    $.extend($.fn.textbox.defaults.rules, {
+        eqPwd: {
+            validator: function (value, param) {
+                return value == $(param[0]).val();
+            },
+            message: '密码不一致！'
+        },
+        idcard: {// 验证身份证
+            validator: function (value) {
+                return /^\d{15}(\d{2}[A-Za-z0-9])?$/i.test(value.trim());
+            },
+            message: '身份证号码格式不正确'
+        },
+        minLength: {
+            validator: function (value, param) {
+                return value.length >= param[0];
+            },
+            message: '请输入至少（2）个字符.'
+        },
+        length: {
+            validator: function (value, param) {
+                var len = $.trim(value).length;
+                return len >= param[0] && len <= param[1];
+            },
+            message: "输入内容长度必须介于{0}和{1}之间."
+        },
+        mobile: {// 验证手机号码
+            validator: function (value) {
+                return /^(13|15|18)\d{9}$/i.test(value.trim());
+            },
+            message: '手机号码不正确'
+        },
+        email: {// 验证email
+            validator: function (value) {
+                return /[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[a-zA-Z0-9]+/i.test(value.trim());
+            },
+            message: '邮箱格式不正确'
+        },
+        chinese: {// 验证中文
+            validator: function (value) {
+                return /^[\Α-\￥]+$/i.test(value);
+            },
+            message: '请输入中文'
+        }
+    });
 </script>
 </body>
 </html>

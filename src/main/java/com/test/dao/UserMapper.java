@@ -24,6 +24,8 @@ public interface UserMapper extends JpaRepository<User,String>, CrudRepository<U
     @Query(value = "delete from table_1 t where COLUMN_1 in (?1)",nativeQuery = true)
     void deleteBatch(String[] ids);
 
+
+    Page<User> findByNameLike(String name,Pageable pageable);
     //?1 ?2  &   :id :name
 
 //    List<User>  getAllByName(String name);

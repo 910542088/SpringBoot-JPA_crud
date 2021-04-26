@@ -1,5 +1,6 @@
 package com.test.service.impl;
 
+import com.test.common.util.UserUtil;
 import com.test.dao.UserMapper;
 import com.test.domain.User;
 import com.test.service.UserService;
@@ -19,7 +20,7 @@ public class UserServiceImpl implements UserService {
     UserMapper mapper;
 
     @Override
-    public User saveOrUpdate(User user) {
+    public User saveOrUpdate(User user){
         return mapper.save(user);
     }
 
@@ -32,7 +33,6 @@ public class UserServiceImpl implements UserService {
     public int delete(String[] id) {
         try {
             mapper.deleteBatch(id);
-
         } catch (Exception e) {
             e.printStackTrace();
             return 0;
@@ -48,9 +48,8 @@ public class UserServiceImpl implements UserService {
         } else {//有搜索查询，根据name值判断
             User user;
             if ("Column_2".equals(name)) {
-                user = new User();
-                user.setName(value);
-                return getUserList(user, page, pageSize);
+                PageRequest pageRequest = PageRequest.of(page - 1, pageSize,Sort.by(Sort.Direction.DESC,"created"));
+                return mapper.findByNameLike("%"+value+"%",pageRequest);
             } else if ("Column_8".equals(name)) {
                 user = new User();
                 user.setPhoneNumber(value);

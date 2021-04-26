@@ -8,6 +8,8 @@ import org.hibernate.annotations.GenericGenerator;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -24,41 +26,47 @@ public class User implements Serializable {
     private String id;
     @Column( name = "Column_2")
     @ExcelProperty("姓名")
+    @Pattern(regexp = "^[\\u4e00-\\u9fa5]+$",message = "姓名只能为中文并且没有特殊字符!")
     private String name;
     @Column( name = "Column_3")
-    @ExcelProperty("姓名简拼")
+    @ExcelProperty("姓名全拼")
+    @Pattern(regexp = "^[a-z]+$",message = "姓名全拼只能为小写字母且没有特殊字符!")
     private String spellName;
     @Column( name = "Column_4")
     @ExcelProperty("性别")
+    @NotBlank(message = "性别不能为空！")
+    @Pattern(regexp = "^[男|女]$",message = "性别信息有误，请按正确格式输入！")
     private String sex;
     @Column( name = "Column_5")
-    @ExcelProperty("证件类型")
+    @ExcelProperty("身份证证件类型")
+    @NotBlank(message = "身份证证件类型不能为空！")
     private String idType;
     @Column( name = "Column_6")
-    @ExcelProperty("证件编号")
+    @ExcelProperty("身份证件号码")
+    @Pattern(regexp = "^\\d{15}(\\d{2}[A-Za-z0-9])?$",message = "身份证号码不正确!")
     private String idNumber;
     @Column( name = "Column_7")
-    @JsonFormat(pattern = "yyyy/MM/hh",timezone = "GMT+8")
-    @ExcelProperty("生日")
-    @DateTimeFormat("yyyy/MM/dd")
+    @ExcelProperty(value = "出生日期")
+    @DateTimeFormat(value = "yyyy-MM-dd")//前端数据格式转换
+    @JsonFormat(pattern = "yyyy/MM/dd",timezone = "GMT+8")//后台发送数据格式转换
     private Date birthday;
     @Column( name = "Column_8")
     @ExcelProperty("手机号码")
+    @Pattern(regexp = "^(13[0-\u00AD9]|14[5|7]|15[0-9]|18[0-9])\\d{8}$", message = "手机号信息有误，请输入正确的手机号！")
     private String phoneNumber;
     @Column( name = "Column_9")
     @ExcelProperty("电子邮箱")
+    @Pattern(regexp = "[a-zA-Z0-9]+@[a-zA-Z0-9]+\\.[a-zA-Z0-9]+",message = "请输入正确的邮箱地址！")
     private String email;
     @Column( name = "createtime",updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     @org.hibernate.annotations.CreationTimestamp
-    @ExcelProperty("创建时间")
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ExcelIgnore
     private Date created;
     @Column( name = "updatetime")
     @Temporal(TemporalType.TIMESTAMP)
     @org.hibernate.annotations.UpdateTimestamp
-    @ExcelProperty("修改时间")
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ExcelIgnore
     private Date update;
@@ -195,7 +203,7 @@ public class User implements Serializable {
 //        (
 //        Column_1             char(32) not null comment 'Column_1',
 //        Column_2             varchar(200) comment '姓名',
-//        Column_3             varchar(200) comment '姓名简拼',
+//        Column_3             varchar(200) comment '姓名全拼',
 //        Column_4             varchar(10) comment '性别',
 //        Column_5             varchar(200) comment '身份证证件类型',
 //        Column_6             varchar(200) comment '身份证件号码',

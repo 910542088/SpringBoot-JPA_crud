@@ -7,8 +7,7 @@ import java.net.URLEncoder;
 
 public class ExcelUtil {
     public static OutputStream getOutputStream(String fileName, HttpServletResponse response)
-            throws Exception{
-        try{
+            throws IOException {
             fileName = URLEncoder.encode(fileName,"utf-8");
             response.setContentType("application/vnd.ms-excel");
             response.setCharacterEncoding("utf-8");
@@ -18,8 +17,5 @@ public class ExcelUtil {
             response.setHeader("Cache-Control", "no-store");
             response.addHeader("Cache-Control", "max-age=0");
             return response.getOutputStream();
-        } catch (IOException e){
-            throw new Exception("导出文件失败！");
-        }
     }
 }
